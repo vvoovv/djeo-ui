@@ -1,0 +1,109 @@
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<link rel="stylesheet" href="../../dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" href="../../cbtree/themes/claro/claro.css" />
+<link rel="stylesheet" href="../tree/resources/tree.css" />
+
+<style>
+html, body, #container{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	padding: 0;
+	margin: 0;
+}
+#map{
+	background-color: #f1eee8;
+}
+</style>
+
+<script>
+	dojoConfig = {
+		isDebug: true,
+		async: true,
+		parseOnLoad: false,
+		djeoEngine: "djeo",
+		ymapsKey: "AMOPgE4BAAAA9Y-BUwMAonjZ5NBRJDj54c-cDVPzQcYlLNAAAAAAAAAAAACPSuKS9WyCiMuXm9An1ZKCx5Pk-A=="
+	};
+</script>
+<script src="../../dojo/dojo.js"></script>
+
+<script>
+
+require([
+	"djeo/parser/osm",
+	"djeo/tests/data/usa_features_style",
+	"dojo/_base/kernel", // locale
+	"dojo/_base/array", // forEach
+	"dojo/dom-construct", // place
+	"dojo/aspect", // after
+	"dijit/layout/BorderContainer",
+	"dijit/layout/ContentPane",
+	
+	"djeo/Map",
+	"djeo/control/Highlight",
+	"djeo/control/Tooltip",
+	"djeo/control/Navigation",
+
+	"djeo-ui/Tree",
+	"djeo/projection",
+	
+	"dojo/domReady!"
+],
+function(osm, mapConfig, kernel, array, domConstruct, aspect, BorderContainer, ContentPane, Map, Highlight, Tooltip, Navigation, Tree) {
+	var nameAttr = "name:" + kernel.locale.substr(0, 2);
+
+	var bc = new BorderContainer({
+		design: "sidebar"
+	}, "container");
+	
+	var treeCp = new ContentPane({
+		region: "leading",
+		style: "width: 250px",
+		splitter: true
+	});
+	bc.addChild(treeCp);
+	
+	var mapCp = new ContentPane({
+		region: "center",
+		style: "padding: 0",
+		content: "<div id='map' style='width:100%; height:100%;'></div>"
+	});
+	bc.addChild(mapCp);
+	
+	bc.startup();
+
+	mapConfig.iconBasePath = "../../djeo/tests/";
+	var map = new Map("map", mapConfig);
+	map.ready(function() {
+		aspect.after(mapCp, "resize", function(){
+			map.resize();
+		});
+		new Highlight(map);
+		new Tooltip(map);
+		new Navigation(map);
+
+		var tree = new Tree({
+			rootLabel: "OpenStreetMap Explorer",
+			map: map,
+			modelOptions: {
+				getLabel: function(feature) {
+					return (feature === this.map.document) ? this.rootLabel :
+						feature[nameAttr] ? feature[nameAttr] : (feature.name ? feature.name : "");
+				}
+			},
+			style: "height: 100%"
+		});
+		domConstruct.place(tree.domNode, treeCp.domNode);
+	});
+});
+</script>
+
+</head>
+
+<body class="claro">
+	<div id="container"></div>
+</body>
+</html>
