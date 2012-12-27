@@ -39,8 +39,8 @@ return declare([Tree], {
 		}
 		else {
 			// calculated style
-			var cs = feature.state.cs;
-			if (cs.guiIcon || P.getImgSrc(cs) || feature.isArea()) {
+			var cs = feature.reg.cs;
+			if ( (cs && (cs.guiIcon || P.getImgSrc(cs))) || feature.isArea()) {
 				result = "djeoBaseFeature";
 			}
 		}
@@ -51,13 +51,13 @@ return declare([Tree], {
 		var result;
 		if (!feature.isContainer) {
 			// check if we have an icon
-			var cs = feature.state.cs;
-			if (!cs.guiIcon && feature.isArea()) {
+			var cs = feature.reg.cs;
+			if (!(cs && cs.guiIcon) && feature.isArea()) {
 				result = {
 					backgroundColor: cs.area && cs.area.fill ? cs.area.fill : cs.fill
 				}
 			}
-			else {
+			else if (cs){
 				var src = cs.guiIcon || P.getImgSrc(cs);
 				if (src) {
 					result = {
