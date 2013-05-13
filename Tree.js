@@ -15,14 +15,16 @@ return declare([Tree], {
 		if (!kwArgs.map) {
 			throw new Error("'map' attribute must be provided as an argument");
 		}
-		var modelKwArgs = {
-			map: kwArgs.map,
-			rootLabel: kwArgs.rootLabel || this.rootLabel
+		if (!this.model) {
+			var modelKwArgs = {
+				map: kwArgs.map,
+				rootLabel: kwArgs.rootLabel || this.rootLabel
+			}
+			if (kwArgs.modelOptions) {
+				lang.mixin(modelKwArgs, kwArgs.modelOptions);
+			}
+			this.model = new Model(modelKwArgs);
 		}
-		if (kwArgs.modelOptions) {
-			lang.mixin(modelKwArgs, kwArgs.modelOptions);
-		}
-		this.model = new Model(modelKwArgs);
 	},
 	
 	postCreate: function(){

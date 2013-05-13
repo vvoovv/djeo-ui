@@ -13,6 +13,12 @@ return declare([Stateful], {
 	multiState: true,
 	
 	labelAttr: "name",
+	
+	// this option is needed to enable tree usage for clustering
+	featuresAttr: "features",
+	
+	// FeatureContainer to be used as a top tree element instead of the whole map 
+	topFeatureContainer: null,
 
 	constructor: function(kwArgs) {
 		lang.mixin(this, kwArgs);
@@ -36,7 +42,7 @@ return declare([Stateful], {
 		// summary:
 		//		Calls onItem with the root item for the tree, possibly a fabricated item.
 		//		Calls onError on error.
-		onItem(this.map.document);
+		onItem(this.topFeatureContainer || this.map.document);
 	},
 
 	mayHaveChildren: function(feature){
@@ -59,7 +65,7 @@ return declare([Stateful], {
 		// onComplete: function(items)
 		// tags:
 		//		extension
-		onComplete(parentFeature.features);
+		onComplete(parentFeature[this.featuresAttr]);
 	},
 
 	// =======================================================================
@@ -181,7 +187,7 @@ return declare([Stateful], {
 	_updateCheckedParent: function(feature, isMixedState) {
 		var parent = feature.parent;
 		if (parent === this.map) return;
-		var features = parent.features;
+		var features = parent[this.featuresAttr];
 		// finding which state the parent has now
 		var checkedState = true;
 		if (parent.numVisibleFeatures==0) {
